@@ -113,6 +113,10 @@ function addRuleConstructor(id, detail) {
         .attr("readonly", true).attr("type", "hidden");
 
     function updateRes(c) {
+        // clear preview
+        $("#summary").html('')
+        $("#summary").hide()
+
         var m = new Object();
         var m1 = new Object();
 
@@ -278,7 +282,10 @@ function addFD(id, detail) {
         .attr("readonly", true).attr("type", "hidden");
 
     function updateRes(c) {
-        //console.log(c.id)
+        // clear preview
+        $("#summary").html('')
+        $("#summary").hide()
+
         var tpid = getFirstNum(c.id); 
         var table = $("#" + "Rule-" + tpid + "-Delta").val();
         var res = "DELETE * FROM " + table + " WHERE " + table + ".* IN (SELECT " + table + "1.* FROM " +
@@ -344,6 +351,10 @@ function addFK(id, detail) {
 
     // update results
     function updateRes(c) {
+        // clear preview
+        $("#summary").html('')
+        $("#summary").hide()
+
         var tpid = getFirstNum(c.id);
         var tb1 = $("#" + "Rule-" + tpid + "-Table1").val();
         var tb2 = $("#" + "Rule-" + tpid + "-Table2").val();
@@ -363,6 +374,10 @@ function addFK(id, detail) {
 }
 
 function addRule() {
+    // clear preview
+    $("#summary").html('')
+    $("#summary").hide()
+
     ruleNum = document.getElementById("delta-rule").childElementCount;
     elem = d3.select('#delta-rule');
     detail = elem.append("div")
@@ -413,6 +428,10 @@ function addRule() {
     //     .attr("name", "rule-" + ruleNum.toString());
 }
 function delRule() {
+    // clear preview
+    $("#summary").html('')
+    $("#summary").hide()
+
     rm = document.getElementById('delta-rule');
     if (rm.childElementCount > 1) {
         rm.removeChild(rm.lastChild);

@@ -119,11 +119,6 @@ class IndependentSemantics(AbsSemantics):
             stat[t[0]] += 1
             tpS.add(self.alias[t])
 
-        
-        # print(bf)
-        # print(bf_alias)
-        # self.convert_bf_to_readable(bf_alias)
-        # print(self.prov_notations, bf, type(bf))
         bf_split = self.convert_bf_to_readable(bf_alias)
         highlight = []
         for s in bf_split:

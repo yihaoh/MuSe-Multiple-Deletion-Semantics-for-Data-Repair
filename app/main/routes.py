@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify
 import json
+import traceback
 import os
 import time
 import psycopg2
@@ -25,14 +26,6 @@ mas_schema = {
     "organization": ['oid', 'name'],
     "cite": ['citing', 'cited']
 }
-# mas_schema = {
-#     "grants": "(gid, name)",
-#     "authgrant": "(aid, gid)",
-#     "author": "(aid, name)",
-#     "cite": "(citing, cited)",
-#     "writes": "(aid, pid)",
-#     "pub": "(pid, title)"
-# }
 
 
 # =========================== Actual Implementation ==============================
@@ -94,8 +87,6 @@ def output():
     # selected semantic
     s = request.form['semantic-selection']
 
-    print(request.form)
-
     # parse all rules
     rules = []
     r, n = 'Rule-', 1
@@ -105,8 +96,6 @@ def output():
         rules.append((tp.split(' ')[3], tp[(tp.find('(') + 1):-2] + ';'))
         n += 1
         ruleNum = r + str(n)
-
-    print(rules)
 
     # Make a duplicate of the database
     cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
@@ -289,7 +278,6 @@ def restore():
 @bp.route('/commit', methods=['POST'])
 @login_required
 def commitChange():
-    print('commit changes!!!!!!!!!')
     for i in request.form:
         data = json.loads(i)
         del_tuples(data)
@@ -317,49 +305,60 @@ def preview():
         rules.append((r.split(' ')[3], r[(r.find('(') + 1):-2] + ';'))
 
     if len(rules) == 0:
-        return ''
+        cur.close()
+        conn.close()
+        return 'No rule is present'
 
     stats = {}
 
-    cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
-    conn.commit()
-    db = DatabaseEngine(delta_db)
-    ind_sem = IndependentSemantics(db, rules, tables)
-    _, _, stats['independent'] = ind_sem.find_mss(mas_schema)
-    db.close_connection()
-    del db
-    cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
-    conn.commit()
+    try:
+        cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
+        conn.commit()
+        db = DatabaseEngine(delta_db)
+        ind_sem = IndependentSemantics(db, rules, tables)
+        _, _, stats['independent'] = ind_sem.find_mss(mas_schema)
+        db.close_connection()
+        del db
+        cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
+        conn.commit()
 
-    cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
-    conn.commit()
-    db = DatabaseEngine(delta_db)
-    step = StepSemantics(db, rules, tables)
-    _, _, stats['step'] = step.find_mss(mas_schema)
-    db.close_connection()
-    del db
-    cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
-    conn.commit()
+        cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
+        conn.commit()
+        db = DatabaseEngine(delta_db)
+        step = StepSemantics(db, rules, tables)
+        _, _, stats['step'] = step.find_mss(mas_schema)
+        db.close_connection()
+        del db
+        cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
+        conn.commit()
 
-    cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
-    conn.commit()
-    db = DatabaseEngine(delta_db)
-    stage = StageSemantics(db, rules, tables)
-    _, _, stats['stage'] = stage.find_mss()
-    db.close_connection()
-    del db
-    cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
-    conn.commit()
+        cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
+        conn.commit()
+        db = DatabaseEngine(delta_db)
+        stage = StageSemantics(db, rules, tables)
+        _, _, stats['stage'] = stage.find_mss()
+        db.close_connection()
+        del db
+        cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
+        conn.commit()
 
-    cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
-    conn.commit()
-    db = DatabaseEngine(delta_db)
-    end_sem = EndSemantics(db, rules, tables)
-    _, _, stats['end'] = end_sem.find_mss()
-    db.close_connection()
-    del db
-    cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
-    conn.commit()
+        cur.execute('CREATE DATABASE ' + delta_db + ' WITH TEMPLATE ' + mydb + ';')
+        conn.commit()
+        db = DatabaseEngine(delta_db)
+        end_sem = EndSemantics(db, rules, tables)
+        _, _, stats['end'] = end_sem.find_mss()
+        db.close_connection()
+        del db
+        cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
+        conn.commit()
+    except Exception as ex:
+        print(ex)
+        traceback.print_exc()
+        if db:
+            db.close_connection()
+            del db
+        cur.execute('DROP DATABASE IF EXISTS ' + delta_db + ';')
+        conn.commit()
 
     cur.close()
     conn.close()
@@ -384,7 +383,6 @@ def del_tuples(data):
                     query += attrs[i] + "=%s"
                     query += " AND " if i < len(attrs) - 1 else ";"
 
-            # print(query)
             for t in val[1]:
                 cur.execute(query, tuple(t[1:]))
                 conn.commit()

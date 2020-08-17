@@ -189,9 +189,9 @@
 
                         <div class="card card-cascade narrower mb-5"
                              style="display:none;" id="summary">
-                            <div class="spinner-border" role="status" id="spinner">
-                                <span class="sr-only">Loading...</span>
-                            </div>
+                        </div>
+                        <div class="spinner-border" role="status" id="spinner" style="display: none">
+                            <span class="sr-only">Loading...</span>
                         </div>
                     </form>
                 </div>
@@ -241,8 +241,8 @@
             const previewButton = document.getElementById('result-preview')
             previewButton.onclick = function () {
                 $('#summary').toggle()
-                console.log('count', document.getElementById('summary').childElementCount == 1)
-                if (document.getElementById('summary').childElementCount == 1) {
+                if (document.getElementById('summary').childElementCount == 0) {
+                    $("#spinner").show()
                     let d = {}
                     let arr = []
                     let id = 1
@@ -264,6 +264,7 @@
                             $("#spinner").hide()
                         },
                         error: function (xhr, status, err) {
+                            $("#spinner").hide()
                             console.log(xhr);
                         }
                     })

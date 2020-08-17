@@ -54,8 +54,6 @@ class DatabaseEngine():
         # self.create_deltas()
 
     def __del__(self):
-        print('close connection dba')
-        # self.connection.commit()
         self.close_connection()
 
     def create_semiring_functions(self):
@@ -218,8 +216,8 @@ class DatabaseEngine():
             self.execute_query("DELETE FROM " + "delta_" + name + ";")
 
     def load_database_tables(self, lst_names, is_delta=False):
-
-        schema = self.mas_schema if all(name in self.mas_schema for name in lst_names) else self.tpc_h_schema
+        # schema = self.mas_schema if all(name in self.mas_schema for name in lst_names) else self.tpc_h_schema
+        schema = self.mas_schema
         cursor = self.connection.cursor()
         for name in lst_names:
 
