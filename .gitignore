@@ -1,0 +1,6 @@
+.idea/
+migrations/
+Dracula/
+.DS_Store
+env/
+causal_rules/

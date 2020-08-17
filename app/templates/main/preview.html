@@ -1,0 +1,159 @@
+<div class=" px-4 mb-4 mt-4" id="preview">
+    <div class="container">
+        <ul class="nav nav-tabs md-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#tab1" aria-selected="true">Independent</a>
+            </li>
+            <li class="nav-item">
+                <!-- <a data-toggle="tab" id= "bs-tab2" href="#tab2">Chart 2</a> -->
+                <a class="nav-link " data-toggle="tab" href="#tab2" aria-selected="false">Step</a>
+            </li>
+            <li class="nav-item">
+                <!-- <a data-toggle="tab" id= "bs-tab2" href="#tab2">Chart 2</a> -->
+                <a class="nav-link " data-toggle="tab" href="#tab3" aria-selected="false">Stage</a>
+            </li>
+            <li class="nav-item">
+                <!-- <a data-toggle="tab" id= "bs-tab2" href="#tab2">Chart 2</a> -->
+                <a class="nav-link " data-toggle="tab" href="#tab4" aria-selected="false">End</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div id="tab1" class="tab-pane fade show active">
+                <canvas id="horizontalBar1"></canvas>
+            </div>
+            <div id="tab2" class="tab-pane fade">
+                <canvas id="horizontalBar2"></canvas>
+            </div>
+            <div id="tab3" class="tab-pane fade">
+                <canvas id="horizontalBar3"></canvas>
+            </div>
+            <div id="tab4" class="tab-pane fade">
+                <canvas id="horizontalBar4"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const stat = {{ stats | safe }}
+
+new Chart(document.getElementById("horizontalBar1"), {
+    "type": "horizontalBar",
+    "data": {
+        "labels": ['author', 'publication', 'writes', 'organization', 'cite'],
+        "datasets": [{
+            "label": "Independent Semantic",
+            "data": stat['independent'],
+            "fill": false,
+            "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)",
+                "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)",
+                "rgba(153, 102, 255, 0.2)"//, "rgba(201, 203, 207, 0.2)"
+            ],
+            "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)",
+                "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)"//, "rgb(201, 203, 207)"
+            ],
+            "borderWidth": 1
+        }]
+    },
+    "options": {
+        "scales": {
+            "xAxes": [{
+                "ticks": {
+                    "beginAtZero": true,
+                    "stepSize": 1
+                }
+            }]
+        }
+    }
+});
+
+new Chart(document.getElementById("horizontalBar2"), {
+    "type": "horizontalBar",
+    "data": {
+        "labels": ['author', 'publication', 'writes', 'organization', 'cite'],
+        "datasets": [{
+            "label": "Step Semantic",
+            "data": stat['step'],
+            "fill": false,
+            "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)",
+                "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)",
+                "rgba(153, 102, 255, 0.2)"//, "rgba(201, 203, 207, 0.2)"
+            ],
+            "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)",
+                "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)"//, "rgb(201, 203, 207)"
+            ],
+            "borderWidth": 1
+        }]
+    },
+    "options": {
+        "scales": {
+            "xAxes": [{
+                "ticks": {
+                    "beginAtZero": true,
+                    "stepSize": 1
+                }
+            }]
+        }
+    }
+});
+
+new Chart(document.getElementById("horizontalBar3"), {
+    "type": "horizontalBar",
+    "data": {
+        "labels": ['author', 'publication', 'writes', 'organization', 'cite'],
+        "datasets": [{
+            "label": "Stage Semantic",
+            "data": stat['stage'],
+            "fill": false,
+            "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)",
+                "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)",
+                "rgba(153, 102, 255, 0.2)"//, "rgba(201, 203, 207, 0.2)"
+            ],
+            "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)",
+                "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)"//, "rgb(201, 203, 207)"
+            ],
+            "borderWidth": 1
+        }]
+    },
+    "options": {
+        "scales": {
+            "xAxes": [{
+                "ticks": {
+                    "beginAtZero": true,
+                    "stepSize": 1
+                }
+            }]
+        }
+    }
+});
+
+new Chart(document.getElementById("horizontalBar4"), {
+    "type": "horizontalBar",
+    "data": {
+        "labels": ['author', 'publication', 'writes', 'organization', 'cite'],
+        "datasets": [{
+            "label": "End Semantic",
+            "data": stat['end'],
+            "fill": false,
+            "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)",
+                "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)",
+                "rgba(153, 102, 255, 0.2)"//, "rgba(201, 203, 207, 0.2)"
+            ],
+            "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)",
+                "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)"//, "rgb(201, 203, 207)"
+            ],
+            "borderWidth": 1
+        }]
+    },
+    "options": {
+        "scales": {
+            "xAxes": [{
+                "ticks": {
+                    "beginAtZero": true,
+                    "stepSize": 1
+                }
+            }]
+        }
+    }
+});
+</script>

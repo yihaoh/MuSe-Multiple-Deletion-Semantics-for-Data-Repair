@@ -1,0 +1,111 @@
+{
+    "nodes": [
+
+        {
+            "name": "organization",
+            "type": "table",
+            "id": 2
+        },
+        {
+            "name": "author",
+            "type": "table",
+            "id": 3
+        },
+        {
+            "name": "cite",
+            "type": "table",
+            "id": 4
+        },
+        {
+            "name": "writes",
+            "type": "table",
+            "id": 5
+        },
+        {
+            "name": "publication",
+            "type": "table",
+            "id": 6
+        },
+        {
+            "name": "oid",
+            "type": "tag",
+            "id": 7
+        },
+        {
+            "name": "aid",
+            "type": "tag",
+            "id": 8
+        },
+        {
+            "name": "name",
+            "type": "tag",
+            "id": 9
+        },
+        {
+            "name": "title",
+            "type": "tag",
+            "id": 10
+        },
+        {
+            "name": "year",
+            "type": "tag",
+            "id": 11
+        },
+        {
+            "name": "pid",
+            "type": "tag",
+            "id": 12
+        },
+        {
+            "name": "name",
+            "type": "tag",
+            "id": 13
+        }
+    ],
+    "links": [
+        {
+            "source": 2,
+            "target": 7
+        },
+        {
+            "source": 2,
+            "target": 13
+        },
+        {
+            "source": 3,
+            "target": 8
+        },
+        {
+            "source": 3,
+            "target": 9
+        },
+        {
+            "source": 6,
+            "target": 10
+        },
+        {
+            "source": 6,
+            "target": 11
+        },
+        {
+            "source": 6,
+            "target": 12
+        },
+        {
+            "source": 12,
+            "target": 4
+        },
+        {
+            "source": 8,
+            "target": 5
+        },
+        {
+            "source": 12,
+            "target": 5
+        },
+        {
+            "source": 7,
+            "target": 3
+        }
+    ]
+}

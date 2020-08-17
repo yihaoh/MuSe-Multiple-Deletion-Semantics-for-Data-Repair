@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MuSe</title>
+
+    <style>
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            /* width: 60px;					 */
+            width: auto;
+            /* height: 28px;					 */
+            height: auto;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: rgb(18, 201, 201);
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+
+    <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script> -->
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.10.1/css/mdb.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@5.9.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc14"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@3.29.1"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- <link href={{ url_for('static', filename='css/interv.css') }} rel="stylesheet"> -->
+    <!-- <script type="text/javascript" src="http://www.graphdracula.net/js/raphael-min.js"></script> -->
+    <script type="text/javascript" src="http://graphdracula.net/0.0.3alpha/js/raphael-min.js"></script> 
+    <script type="text/javascript" src="http://graphdracula.net/0.0.3alpha/js/dracula_graffle.js"></script>
+    <script type="text/javascript" src="http://graphdracula.net/0.0.3alpha/js/dracula_graph.js"></script>
+    <script type="text/javascript" src="http://graphdracula.net/0.0.3alpha/js/dracula_algorithms.js"></script>
+    
+
+    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/graphdracula/1.3.0/dracula.min.js"></script> -->
+
+</head>
+
+<body id="body">
+    <nav class="navbar navbar-dark bg-dark shadow navbar-expand-lg fixed-top">
+        <div class="navbar-collapse collapse">
+            <a class="navbar-brand mr-auto" href="#">MuSe: Database Repair System</a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-info dropdown-toggle px-3" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+                  <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <button type="button" class="btn btn-info px-5">Hi! {{ user.username }}</button>
+                
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="#">Profile</a>
+                  <a class="dropdown-item" href="#">Customize Database</a>
+                  <a class="dropdown-item" href="#">Load Default Database</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+                </div>
+            </div>
+    
+        </div>
+    </nav>
+
+
+
+    <div class="container-fluid" style="padding-top: 65px;">
+        <div class="row">
+            <nav class="col-md-3 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <h6
+                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Available Tables</span>
+                        <a class="d-flex align-items-center text-muted" href="#">
+                            <span data-feather="plus-circle"></span>
+                        </a>
+                    </h6>
+                    <!-- {% set active_table = active_table|default("adult") %} -->
+                    <ul class="nav flex-column mb-2">
+                        {% for i in available_tables %}
+                        <li class="nav-item">
+                            <span data-feather="file-text"></span>{{ i }}{{ caption|e }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <h6
+                        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Table Schemas</span>
+                        <a class="d-flex align-items-center text-muted" href="#">
+                            <span data-feather="plus-circle"></span>
+                        </a>
+                    </h6>
+                    <ul class="nav flex-column mb-2">
+                        {% for key, val in table_schemas.items() %}
+                        <li class="nav-item">
+                            {{ key }}: {{ val }}
+                            <!-- <span data-feather="file-text"></span>{{ i }}{{ caption|e }} -->
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+
+
+                </div>
+            </nav>
+
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-9 px-4">
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 class="h3">Deleted Tuples ({{ semantic }} Semantics)</h2>
+
+                    <button id="visualize" type="submit" class="btn btn-primary btn-run"
+                        onclick="$('#hood').toggle(1000)">Under the Hood</button>
+                    <button id="commit-button" type="submit" class="btn btn-primary btn-run">Commit</button>
+                    <form id="query-form" action="/" method="GET">
+                        <button type="submit" class="btn btn-primary btn-run">Back</button>
+                    </form>
+
+                </div>
+
+                <div id="hood">
+                    <!-- <svg id="graph"></svg> -->
+                </div>
+
+                <br>
+
+                <div id="rules">
+                    <h3>Rules:</h3>
+                    <ol>
+                        {% for r in rules %}
+                        <li>delta_{{ r[0] }} :- {{ r[1] }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+
+                </br>
+
+                <div id="res"></div>
+
+            </main>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        // this script serves to process visualization
+        var semantic = {{ semantic | safe }};
+
+        window.onload = function() {
+                $('#hood').toggle("fast");
+        }
+
+        if (semantic == "Independent") {
+            var v = d3.select("#hood");
+            v.attr("class", "container narrower text-justify text-center");
+            v.attr("style", "background-color: rgba(0, 255, 0, 0.3); overflow-x: auto; font-size: 30px");
+            var bf = {{ visual | safe }};
+            for (i = 0; i < bf[0].length; i++) {
+                if (bf[1][i] == 1)
+                    v.append("span").text(bf[0][i]).attr("class", "badge-pill badge-warning");
+                else 
+                    v.append("span").text(bf[0][i]);//.attr("class", "badge-pill");
+            }
+            // v.append("p").attr("class", "mt-2 text-justify text-center").text(bf);
+        }
+        else if (semantic == "Step") {
+            var render = function(r, n) {
+                //console.log(r, n); //#33FF3C
+                /* the Raphael set is obligatory, containing all you want to display */
+                if (n.label == "author2" || n.label == "author3" || n.label == "grants2" || n.label == "writes1" || n.label == "writes2") {
+                    var set = r.set().push(
+                    /* custom objects go here */
+                        r.rect(n.point[0]-30, n.point[1]-13, 100, 50).attr({"fill": "#33FF3C", "stroke-width": 2, r : "9px"})).push(
+                        r.text(n.point[0]+20, n.point[1]+10, n.label).attr({"font-size":"14px"}));
+                    /* custom tooltip attached to the set */
+                    set.items.forEach(function(el) {el.tooltip(r.set()
+                        // .push(
+                        //     r.rect(-300, -120, 30, 20)
+                        //     .attr({"fill": "#fec", "stroke-width": 1, r : "9px"}))
+                        .push(r.text(-300, -120, n.info).attr({"font-size":"14px"}))
+                        )});
+                    return set;
+                }
+
+                var set = r.set().push(
+                /* custom objects go here */
+                    r.rect(n.point[0]-30, n.point[1]-13, 100, 50).attr({"fill": "#fa8", "stroke-width": 2, r : "9px"})).push(
+                    r.text(n.point[0]+20, n.point[1]+10, n.label).attr({"font-size":"14px"}));
+                /* custom tooltip attached to the set */
+                set.items.forEach(function(el) {el.tooltip(r.set()
+                    .push(r.text(-300, -120, n.info).attr({"font-size":"14px"}))
+                    )});
+                return set;
+                
+            };
+            
+            // process Provenance graph
+            var height = document.getElementById('hood').offsetHeight;
+            var width = document.getElementById('hood').offsetWidth;
+
+            var prov = {{ visual | safe }};
+            // console.log(prov)
+            var g = new Graph();
+
+            for (i = 0; i < prov.length; i++) {
+                g.addNode(prov[i][0][0], { label: prov[i][0][0], render: render, info: prov[i][0][1]});
+                g.addNode(prov[i][1][0], { label: prov[i][1][0], render: render, info: prov[i][1][1]});
+                g.addEdge(prov[i][0][0], prov[i][1][0], { directed: true });
+            }
+            var layouter = new Graph.Layout.Spring(g);
+            layouter.layout();
+            var renderer = new Graph.Renderer.Raphael("hood", g, width, height);
+            renderer.draw();
+        }
+    </script>
+
+    <script>
+        // this script serves to process deleted tuples
+        var semantic = {{ semantic | safe }};
+        var del_tuple = {{ deleted | safe }};
+
+        //console.log(semantic);
+        //console.log(del_tuple);
+        var db = {}
+
+        if (semantic == "Independent" || semantic == "End") {
+            // console.log("ind sem");
+            var show = d3.select("#res");
+            for (var key in del_tuple) {
+                //console.log(key, del_tuple[key]);
+                div1 = show.append("div");
+                div1.attr("class", "card card-cascade narrower")
+                div2 = div1.append("div");
+                div2.attr("class", "view view-cascade gradient-card-header blue-gradient narrower py-2 mx-4 mt-2 d-flex justify-content-between align-items-center");
+                div2.append("a").attr("class", "white-text mx-3 h3").text(key + ", Deleted Tuples: " + (del_tuple[key].length - 1));
+
+                db[key] = [];
+                db[key].push(del_tuple[key][0]);
+                db[key].push(del_tuple[key].slice(1, del_tuple[key].length));
+                console.log(db[key]);
+
+                div3 = div1.append("div").attr("class", "px-4").append("div").attr("class", "table-wrapper")
+                table = div3.append("table");
+                table.attr("class", "table table-bordered table-hover mb-2");
+                header = table.append("thead").append("tr")
+                header.selectAll("th")
+                    .data(del_tuple[key][0])
+                    .enter()
+                    .append("th")
+                    .text(function (d) { return d; }).attr("class", "h4");
+                rows = table.append("tbody")
+                    .selectAll("tr")
+                    .data(del_tuple[key].slice(1, del_tuple[key].length))
+                    .enter()
+                    .append("tr");
+                cells = rows.selectAll("td")
+                    .data(function (d) { return d; })
+                    .enter()
+                    .append("td")
+                    .text(function (d) { return d; }).style("font", "25px times");
+                show.append("br");
+            }
+
+        }
+        else if (semantic == "Step") {
+            // process the chart
+            var show = d3.select("#res");
+            // tooltip
+            var msg = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+
+            for (i = 0; i < del_tuple.length; i++) {
+                // table wrapper
+                div1 = show.append("div");
+                div1.attr("class", "card card-cascade narrower")
+                div2 = div1.append("div");
+                div2.attr("class", "view view-cascade gradient-card-header purple-gradient narrower py-2 mx-4 mb-3 mt-2 d-flex align-items-center");
+                div2.append("a").attr("class", "white-text mx-3 h3").text("Step " + i.toString());
+
+                // table name
+                div3 = div1.append("div");
+                div3.attr("class", "view view-cascade gradient-card-header blue-gradient narrower py-2 mx-4 d-flex justify-content-between align-items-center");
+                div3.append("a").attr("class", "white-text mx-3 h3").text(del_tuple[i][0]);
+
+                // actual deleted table
+                div4 = div1.append("div").attr("class", "px-4").append("div").attr("class", "table-wrapper")
+                table = div4.append("table");
+                table.attr("class", "table table-bordered table-hover mb-2");
+                header = table.append("thead").append("tr")
+                header.selectAll("th")
+                    .data(del_tuple[i][1])
+                    .enter()
+                    .append("th")
+                    .text(function (d) { return d; }).attr("class", "h4");
+                //console.log(del_tuple[i].slice(2, del_tuple[i].length)[0].slice(0,2));
+                rows = table.append("tbody")
+                    .selectAll("tr")
+                    .data(del_tuple[i].slice(2, del_tuple[i].length))
+                    .enter()
+                    .append("tr");
+                rows.on("mouseover", function (d) {
+                    msg.transition().duration(200).style("opacity", 0.9);
+                    msg.html("Deleted due to Rule " + d[d.length - 1]).style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px")
+                        .style("font", "25px times");
+                })
+                    .on("mouseout", function (d) {
+                        msg.transition().duration(500).style("opacity", 0);
+                    });
+
+                // add the deleted tuple to db in case of commit
+                if (!db.hasOwnProperty(del_tuple[i][0])) {  // table exist?
+                    db[del_tuple[i][0]] = []
+                    db[del_tuple[i][0]].push(del_tuple[i][1])  // add schema
+                }
+                if (db[del_tuple[i][0]].length == 1) {
+                    db[del_tuple[i][0]].push([]);
+                }
+                db[del_tuple[i][0]][1].push(del_tuple[i][2].slice(0, del_tuple[i][2].length - 1))
+
+                cells = rows.selectAll("td").data(function (d) { /*console.log(d);*/ return d.slice(0, d.length - 1); })
+                    .enter()
+                    .append("td")
+                    .text(function (d) { return d; }).style("font", "30px times");
+                show.append("br");
+            }
+        }
+        else if (semantic == "Stage") {
+            var show = d3.select('#res');
+            var msg = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+            for (i = 0; i < del_tuple.length; i++) {
+                // table wrapper
+                div1 = show.append("div");
+                div1.attr("class", "card card-cascade narrower")
+                div2 = div1.append("div");
+                div2.attr("class", "view view-cascade gradient-card-header purple-gradient narrower py-2 mx-4 mb-3 mt-2 d-flex justify-content-between align-items-center");
+                div2.append("a").attr("class", "white-text mx-3 h3").text("Stage " + i.toString());
+
+                // might have tuples from different tables
+                for (j = 0; j < del_tuple[i].length; j++) {
+                    // table name
+                    div3 = div1.append("div");
+                    div3.attr("class", "view view-cascade gradient-card-header blue-gradient narrower py-2 mx-4 d-flex justify-content-between align-items-center");
+                    div3.append("a").attr("class", "white-text mx-3 h3").text(del_tuple[i][j][0] + ", Deleted Tuples: " + (del_tuple[i][j].length - 2));
+
+                    // actual deleted tuples
+                    div4 = div1.append("div").attr("class", "px-4").append("div").attr("class", "table-wrapper")
+                    table = div4.append("table");
+                    table.attr("class", "table table-bordered table-hover mb-2");
+                    header = table.append("thead").append("tr")
+                    header.selectAll("th")
+                        .data(del_tuple[i][j][1])
+                        .enter()
+                        .append("th")
+                        .text(function (d) { return d; }).attr("class", "h4");
+                    rows = table.append("tbody")
+                        .selectAll("tr")
+                        .data(del_tuple[i][j].slice(2, del_tuple[i][j].length))
+                        .enter()
+                        .append("tr");
+                    rows.on("mouseover", function (d) {
+                        // console.log(d);
+                        msg.transition().duration(200).style("opacity", 0.9);
+                        msg.html("Deleted due to Rule " + d[d.length - 1]).style("left", (d3.event.pageX) + "px").style("top", (d3.event.pageY - 28) + "px");
+                    })
+                        .on("mouseout", function (d) {
+                            msg.transition().duration(500).style("opacity", 0);
+                        });
+                    cells = rows.selectAll("td").data(function (d) { return d.slice(0, d.length - 1); })
+                        .enter()
+                        .append("td")
+                        .text(function (d) { return d; }).style("font", "25px times");
+                    show.append("br");
+
+                    // add the deleted tuple to db in case of commit
+                    if (!db.hasOwnProperty(del_tuple[i][j][0])) {
+                        db[del_tuple[i][j][0]] = [];
+                        db[del_tuple[i][j][0]].push(del_tuple[i][j][1]);
+                        db[del_tuple[i][j][0]].push([]);
+                    }
+                    del_tuple[i][j].slice(2, del_tuple[i][j].length).forEach(function (it) {
+                        db[del_tuple[i][j][0]][1].push(it.slice(0, it.length - 1));
+                    });
+                }
+            }
+        }
+
+        var commitButton = document.getElementById('commit-button');
+        commitButton.onclick = function () {
+            $.ajax({
+                type: "POST",
+                url: "/commit",
+                data: JSON.stringify(db),
+                dataType: "json",
+                //contentType: 'application/json; charset=UTF-8',
+                success: function (response) {
+                    window.location.href = response['url'];
+                }
+            })
+        }
+
+    </script>
+
+
+</body>
+
+</html>
