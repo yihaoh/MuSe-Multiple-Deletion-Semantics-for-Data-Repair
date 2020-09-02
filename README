@@ -1,6 +1,7 @@
 To run the web app (currently in debug mode):
 
 1. Install Python virtual environment
+    python3 -m virtualenv venv
 
 2. Create a virtual environment:
     python3 -m venv /path/to/new/virtual/environment
