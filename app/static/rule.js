@@ -151,7 +151,7 @@ function addRuleConstructor(id, detail) {
                 res += ", " + tp.value;
             }
             else if (m.hasOwnProperty(tp.value) && m[tp.value] > 1) {
-                res += ", " + tp.value + " " + tp.value + m1[tp.value]++;
+                res += ", " + tp.value + " AS " + tp.value + m1[tp.value]++;
             }
             select++;
             tp = d3.select("#Rule-" + tpid + "-Select-" + select).node();
@@ -289,21 +289,21 @@ function addFD(id, detail) {
         var tpid = getFirstNum(c.id); 
         var table = $("#" + "Rule-" + tpid + "-Delta").val();
         var res = "DELETE * FROM " + table + " WHERE " + table + ".* IN (SELECT " + table + "1.* FROM " +
-                    table + " " + table + "1, " + table + " " + table + "2 WHERE ";
+                    table + " AS " + table + "1, " + table + " AS " + table + "2 WHERE ";
 
         var cnt = 1;
         var tp = d3.select("#Rule-" + tpid + "-Attr" + cnt).node();
-        res += table + "1." + tp.value + "=" + table + "2." + tp.value;
+        res += table + "1." + tp.value + " = " + table + "2." + tp.value;
         cnt += 1;
         tp = d3.select("#Rule-" + tpid + "-Attr" + cnt).node();
         while (tp) {
-            res += " AND " + table + "1." + tp.value + "=" + table + "2." + tp.value;
+            res += " AND " + table + "1." + tp.value + " = " + table + "2." + tp.value;
             cnt += 1;
             tp = d3.select("#Rule-" + tpid + "-Attr" + cnt).node();
         }
 
         tp = d3.select("#Rule-" + tpid + "-Right").node();
-        res += " AND " + table + "1." + tp.value + "<>" + table + "2." + tp.value + ");";
+        res += " AND " + table + "1." + tp.value + " <> " + table + "2." + tp.value + ");";
 
         // console.log(res);
         // console.log(d3.select("#" + "Rule-" + tpid + "-Disp"))

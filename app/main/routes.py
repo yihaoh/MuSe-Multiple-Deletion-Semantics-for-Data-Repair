@@ -103,109 +103,117 @@ def output():
 
     db = DatabaseEngine(delta_db)
 
-    # different semantics
-    if s == 'Independent':
-        print('Independent Semantic')
-        ind_sem = IndependentSemantics(db, rules, tables)
-        mss, visualization[s], _ = ind_sem.find_mss(mas_schema)
+    try:
+        # different semantics
+        if s == 'Independent':
+            print('Independent Semantic')
+            ind_sem = IndependentSemantics(db, rules, tables)
+            mss, visualization[s], _ = ind_sem.find_mss(mas_schema)
 
-        res = {}
-        for record in mss:
-            if record[0] not in res:
-                res[record[0]] = []
-                res[record[0]].append(['#'] + mas_schema[record[0]])
-            res[record[0]].append(record[1][1:-1].split(','))
+            res = {}
+            for record in mss:
+                if record[0] not in res:
+                    res[record[0]] = []
+                    res[record[0]].append(['#'] + mas_schema[record[0]])
+                res[record[0]].append(record[1][1:-1].split(','))
 
-        # print(mss)
+            # print(mss)
 
-        deleted['Independent'] = res
-        # table: list of tuples
-        # deleted['Independent'] = {  'Found': [['fid', 'name'], [2, 'ERC']],
-        #                             'AuthGrant': [['aid', 'fid'], [4, 2], [5, 2]], 
-        #                         }
+            deleted['Independent'] = res
+            # table: list of tuples
+            # deleted['Independent'] = {  'Found': [['fid', 'name'], [2, 'ERC']],
+            #                             'AuthGrant': [['aid', 'fid'], [4, 2], [5, 2]],
+            #                         }
 
-    elif s == 'Step':
-        print('Step Semantic')
-        step = StepSemantics(db, rules, tables)
-        mss, visualization[s], _ = step.find_mss(mas_schema)
-        res = []
-        dedup = set()
-        for record in mss:
-            if record not in dedup:
-                dedup.add(record)
-                res.append([record[0], ['#'] + mas_schema[record[0]], list(record[1])])
+        elif s == 'Step':
+            print('Step Semantic')
+            step = StepSemantics(db, rules, tables)
+            mss, visualization[s], _ = step.find_mss(mas_schema)
+            res = []
+            dedup = set()
+            for record in mss:
+                if record not in dedup:
+                    dedup.add(record)
+                    res.append([record[0], ['#'] + mas_schema[record[0]], list(record[1])])
 
-        deleted['Step'] = res
+            deleted['Step'] = res
 
-        # list of [table, schema, list of tuples and rule]
-        # deleted['Step'] = [ ['Found', ['fid', 'name'], [2, 'ERC', 0]], 
-        #                     ['Author', ['aid', 'name'], [4, 'Marge', 1]], 
-        #                     ['Author', ['aid', 'name'], [5, 'Homer', 1]],
-        #                     ['Writes', ['aid', 'pid'], [4, 6, 3]], 
-        #                     ['Writes', ['aid', 'pid'], [5, 7, 3]] ]
+            # list of [table, schema, list of tuples and rule]
+            # deleted['Step'] = [ ['Found', ['fid', 'name'], [2, 'ERC', 0]],
+            #                     ['Author', ['aid', 'name'], [4, 'Marge', 1]],
+            #                     ['Author', ['aid', 'name'], [5, 'Homer', 1]],
+            #                     ['Writes', ['aid', 'pid'], [4, 6, 3]],
+            #                     ['Writes', ['aid', 'pid'], [5, 7, 3]] ]
 
-    elif s == 'Stage':
-        print('Stage Semantic')
-        stage = StageSemantics(db, rules, tables)
-        mss, visualization[s], _ = stage.find_mss()
-        res = []
+        elif s == 'Stage':
+            print('Stage Semantic')
+            stage = StageSemantics(db, rules, tables)
+            mss, visualization[s], _ = stage.find_mss()
+            res = []
 
-        for ms in mss:
-            if len(ms) == 0:
-                break
+            for ms in mss:
+                if len(ms) == 0:
+                    break
 
-            tp = []  # list of [table, schema, tuple...]
-            d = {}
-            # store tuples in map
-            for record in ms:
-                if record[0] not in d:
-                    d[record[0]] = []
-                d[record[0]].append([record[1], record[2]])
+                tp = []  # list of [table, schema, tuple...]
+                d = {}
+                # store tuples in map
+                for record in ms:
+                    if record[0] not in d:
+                        d[record[0]] = []
+                    d[record[0]].append([record[1], record[2]])
 
-            # format the list
-            for key, val in d.items():
-                sub = []  # table, schema, tuples...
-                sub.append(key)
-                sub.append(['#'] + mas_schema[key])
-                for r in val:
-                    sub.append(r)
+                # format the list
+                for key, val in d.items():
+                    sub = []  # table, schema, tuples...
+                    sub.append(key)
+                    sub.append(['#'] + mas_schema[key])
+                    for r in val:
+                        sub.append(r)
 
-                tp.append(sub)
+                    tp.append(sub)
 
-            # add stage to res
-            res.append(tp)
+                # add stage to res
+                res.append(tp)
 
-        deleted['Stage'] = res
-        # list of [table, list of deleted tuples]
-        # deleted['Stage'] = [    [['Found', ['fid', 'name'], [2, 'ERC', 0]]], 
-        #                         [['Author', ['aid', 'name'], [4, 'Marge', 1], [5, 'Homer', 1]]], 
-        #                         [['Writes', ['aid', 'pid'], [4, 6, 3], [5, 7, 3]], ['Pub', ['pid', 'title'], [6, 'x', 2], [7, 'y', 2]]]
-        #                     ]
+            deleted['Stage'] = res
+            # list of [table, list of deleted tuples]
+            # deleted['Stage'] = [    [['Found', ['fid', 'name'], [2, 'ERC', 0]]],
+            #                         [['Author', ['aid', 'name'], [4, 'Marge', 1], [5, 'Homer', 1]]],
+            #                         [['Writes', ['aid', 'pid'], [4, 6, 3], [5, 7, 3]], ['Pub', ['pid', 'title'], [6, 'x', 2], [7, 'y', 2]]]
+            #                     ]
 
-    else:  # s == 'End'
-        print('End Semantic')
-        end_sem = EndSemantics(db, rules, tables)
-        mss, visualization[s], _ = end_sem.find_mss()
-        res = {}
-        for record in mss:
-            if record[0] not in res:
-                res[record[0]] = []
-                res[record[0]].append(['#'] + mas_schema[record[0]])
-            res[record[0]].append(list(record[1]))
+        else:  # s == 'End'
+            print('End Semantic')
+            end_sem = EndSemantics(db, rules, tables)
+            mss, visualization[s], _ = end_sem.find_mss()
+            res = {}
+            for record in mss:
+                if record[0] not in res:
+                    res[record[0]] = []
+                    res[record[0]].append(['#'] + mas_schema[record[0]])
+                res[record[0]].append(list(record[1]))
 
-        deleted['End'] = res
+            deleted['End'] = res
 
-        # same as independent
-        # deleted['End'] = {  'Found': [['fid', 'name'], [2, 'ERC']],
-        #                     'Author': [['aid', 'name'], [4, 'Marge'], [5, 'Homer']], 
-        #                     'Writes': [['aid', 'pid'], [4, 6], [5, 7]], 
-        #                     'Pub': [['pid', 'title'], [6, 'x'], [7, 'y']], 
-        #                     'Cite': [['citing', 'cited'], [7, 6]] }
+            # same as independent
+            # deleted['End'] = {  'Found': [['fid', 'name'], [2, 'ERC']],
+            #                     'Author': [['aid', 'name'], [4, 'Marge'], [5, 'Homer']],
+            #                     'Writes': [['aid', 'pid'], [4, 6], [5, 7]],
+            #                     'Pub': [['pid', 'title'], [6, 'x'], [7, 'y']],
+            #                     'Cite': [['citing', 'cited'], [7, 6]] }
+    except Exception as ex:
+        print(rules)
+        traceback.print_exc()
+        db.close_connection()
+        conn.close()
+
+        return redirect(url_for('main.input'))
+
     db.close_connection()
     del db
 
     # get tables
-    # conn.commit()
     cur.execute('SELECT relname,n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC;')
     tables = [i for i in cur.fetchall() if 'delta' not in i[0]]
 
@@ -245,7 +253,7 @@ def sqlQuery():
         result['rows'] = cur.fetchall()
         # print(result['attrs'])
         # print(result['rows'])
-    except:
+    except Exception as ex:
         result['error'] = 'Query execution failed, please check your query!'
         print('Error in SQL Query!')
 
